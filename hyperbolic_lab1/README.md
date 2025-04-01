@@ -1,0 +1,1 @@
+Implement and test an explicit time finite difference scheme to solve a system of linear hyperbolic partial differential equations. The implementation is built from analysis and results found in the first set of theory exercises.

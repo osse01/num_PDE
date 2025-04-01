@@ -1,0 +1,1 @@
+Implement and test an implicit time finite difference scheme to solve a linear advection-diffusion equation. The implementation is built from analysis and results found in the second set of theory exercises.
