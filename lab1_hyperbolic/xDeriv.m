@@ -7,12 +7,12 @@ function dqdx = xDeriv(q, dx, N)
     
     % Interior points 
     for j = 2:N
-        dqdx(j) = (q(j+1) - q(j-1)) / (2*dx);
+        dqdx(:,j) = (q(:,j+1) - q(:,j-1)) / (2*dx);
     end
     
     % Left boundary
-    dqdx(1) = (q(2) - q(1)) / dx;
+    dqdx(:,1) = (q(:,2) - q(:,1)) / dx;
     
     % Right boundary
-    dqdx(N+1) = (q(N+1) - q(N)) / dx;
+    dqdx(:,N+1) = (q(:,N+1) - q(:,N)) / dx;
 end

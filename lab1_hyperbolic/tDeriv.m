@@ -2,14 +2,12 @@ function dqdt = tDeriv(q, dx, t, N, A)
     % q = [u, v]' so u = q[]
     
     % Space derivitives
-    dudx = xDeriv(q(:, 1), dx, N);
-    dvdx = xDeriv(q(:, 2), dx, N);
+    dqdx = xDeriv(q, dx, N);
     
-    TMP = -1*A*[dudx, dvdx]';
+    TMP = -1*A*dqdx;
     
     dudt = TMP(1, :);
     dvdt = TMP(2, :);
-
 
     dqdt = [dudt; dvdt];
 
