@@ -108,24 +108,32 @@ t = 0;
 t_end = 0.75;
 figure(5)
 [P,E] = eig(A);
+Q_plot = [];
+timeVec = [];
 while t < t_end
     if t + dt > t_end
         dt = t_end - t;
     end
     t = t + dt;
     q = stepByRK3(q,t,dx,dt,N,A);
-    q(1,1) = 0;
-    w = P \ q(:,end);  % Characteristic variables at x = 0
-    w(1) = 0; % w^-(1,t)
-    q(:,end) = P * w;
+    
+    % q(1,1) = 0;
+    % w = P \ q(:,end);  % Characteristic variables at x = 0
+    % w(1) = 0; % w^- (1,t)
+    % q(:,end) = P * w;
 
     q_e = q_exact(x,t);
-    p = plot(x,q(1,:),'r',x,q_e(1,:),'b');
+    Q_plot = [Q_plot; q(1,:)];
+    timeVec = [timeVec, t];
+    p = plot(x,q(1,:),'r',x,q(2,:),'r',x,q_e(1,:),'b', x,q_e(2,:),'b');
     ylim([-0.5,1]);
     legend('q aproximate','q exact');
     title("Wave Plot");
     drawnow;
 end
+surf(x,timeVec,Q_plot)
+xlabel('x')
+ylabel('t')
 
 %% Exercise 2.6
 clc
@@ -157,10 +165,10 @@ for N=N_values
         end
         t = t + dt;
         q = stepByRK3(q,t,dx,dt,N,A);
-        q(1,1) = 0;
-        w = P \ q(:,end);  % Characteristic variables at x = 0
-        w(1) = 0; % w_minus(1,t)
-        q(:,end) = P * w;
+        % q(1,1) = 0;
+        % w = P \ q(:,end);  % Characteristic variables at x = 0
+        % w(1) = 0; % w_minus(1,t)
+        % q(:,end) = P * w;
 
         q_e = q_exact(x,t);
     end
@@ -173,7 +181,7 @@ loglog([50, 100, 200, 400, 800], Error,'o-')
 hold on;
 p = polyfit(log(N_values), log(Error), 1);
 fitted_line = exp(polyval(p, log(N_values)));
-loglog(N_values, fitted_line, '--', 'DisplayName', sprintf('Fit (p=%.2f)', p(1)));
+loglog(N_values, fitted_line, '--','DisplayName', sprintf('Fit (p=%.2f)', p(1)));
 legend('Error',sprintf('Fit (p=%.2f)', p(1)))
 xlabel('N');
 ylabel('Error');

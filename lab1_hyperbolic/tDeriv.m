@@ -9,6 +9,12 @@ function dqdt = tDeriv(q, dx, t, N, A)
     dudt = TMP(1, :);
     dvdt = TMP(2, :);
 
+    dudt(1) = 0;
+    dvdt(1) = 3*dqdx(2,1);
+    
+    dvdt(end) = -3*dqdx(2,end);
+    dudt(end) = -3*dqdx(1,end);
+
     dqdt = [dudt; dvdt];
 
 
