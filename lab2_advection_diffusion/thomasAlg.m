@@ -1,6 +1,6 @@
 function [x] = thomasAlg(a,b,c,d)
 % Standard implementation of Thomas Algorithm 
-%   Solves Ax=d where A is a tridiagonal system with a,b,c diagonals
+%   Solves Ax=d where A is a tridiagonal system with a,b,c as diagonals
 % Returns the solution x
 
 N = length(b); % size of x
