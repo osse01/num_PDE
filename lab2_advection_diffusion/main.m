@@ -4,8 +4,9 @@
 a = 1.1;
 b = 0.05;
 t_end = 0.5;
-
-for Nx = [20, 50, 100, 200, 400]
+err = [];
+N = [20, 50, 100, 200, 400];
+for Nx = N
     dx = 2/(Nx-1);
     dt = 0.5/250; % 250 time steps until t_end
     u_0 = @(x) 1 - sin(pi*x);
@@ -15,10 +16,12 @@ for Nx = [20, 50, 100, 200, 400]
     % Help variables
     alpha = a * dt / (4*dx);
     beta  = b * dt / (2*dx^2);
-    disp(alpha)
-    rhs = 0.5+beta;
-    disp(rhs)
-    continue;
+    
+    % for the check
+    %disp(alpha)
+    %rhs = 0.5+beta;
+    %disp(rhs)
+
     % Construct matrix RHS
     main_diag = ones(Nx, 1) * (1 - 2 * beta);
     lower_diag = ones(Nx-1, 1) * (alpha + beta);
@@ -38,19 +41,27 @@ for Nx = [20, 50, 100, 200, 400]
     
     x = linspace(-1,1,Nx)';
     u_approx = u_0(x);
-    p = plot(x,u_approx);
-    xlim([-1,1]);
-    legend('u aproximate','u exact');
-    title("Wave Plot");
-    drawnow
+    % p = plot(x,u_approx);
+    % xlim([-1,1]);
+    % legend('u aproximate','u exact');
+    % title("Wave Plot");
+    % drawnow
     for t = 0:dt:t_end
         u_exact = u_xt(x,t,a,b,50);
         u_approx = updateU(u_approx);
-        p = plot(x,u_approx,x,u_exact);
-        xlim([-1,1]);
-        legend('u aproximate','u exact');
-        title("Wave Plot");
-        drawnow
-        
+        % p = plot(x,u_approx,x,u_exact);
+        % xlim([-1,1]);
+        % legend('u aproximate','u exact');
+        % title("Wave Plot");
+        % drawnow
     end
+    disp(Nx)
+    disp(dx)
+    e = norm(u_approx - u_exact)
+
+    err = [err,e];
 end
+for k = 2:5
+    EOC(k) = log(err(k)/err(k-1)) / log(N(k-1)/N(k));
+end
+plot(N,EOC)
