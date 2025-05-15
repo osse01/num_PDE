@@ -1,14 +1,20 @@
-%% Main
+% Setup
+close all
+clear
+clc
 
-% Init
+% Declare Variables
 a = 1.1;
 b = 0.05;
 t_end = 0.5;
 err = [];
 N = [20, 50, 100, 200, 400];
+dx_vec = [];
+
 for Nx = N
     dx = 2/(Nx-1);
-    dt = 0.5/250; % 250 time steps until t_end
+    % 250 time steps until t_end
+    dt = 0.5/250; 
     u_0 = @(x) 1 - sin(pi*x);
     u_l = 1; % alpha
     u_r = 1; % beta
@@ -22,7 +28,7 @@ for Nx = N
     %rhs = 0.5+beta;
     %disp(rhs)
 
-    % Construct matrix RHS
+    % Construct Matrix RHS
     main_diag = ones(Nx, 1) * (1 - 2 * beta);
     lower_diag = ones(Nx-1, 1) * (alpha + beta);
     upper_diag = -ones(Nx-1, 1) * (alpha - beta);
@@ -52,22 +58,27 @@ for Nx = N
         % title("Wave Plot");
         % drawnow
     end
-    disp(Nx)
-    disp(dx)
-    e = sqrt(dx)*norm(u_approx - u_exact)
-
+    e = sqrt(dx)*norm(u_approx - u_exact);
+    
+    dx_vec = [dx_vec dx];
     err = [err,e];
 end
 
 for k = 2:5
     EOC(k) = log(err(k)/err(k-1)) / log(N(k-1)/N(k));
 end
+
+% Output For Report
+fprintf("\nOutput for Report:\n")
+fprintf("--------------------------------\n")
+fprintf("Nx \t| dx      \t| E_k\n")
+fprintf("--------------------------------\n")
+for k = 1:5
+        fprintf("%d  \t|%.4f \t|%.4f \n", N(k), dx_vec(k), err(k))
+end
+fprintf("--------------------------------\n")
+
 plot(N(2:5),EOC(2:5),'-x')
-% hold on
-% p = polyfit(log(N(2:5)), log(EOC(2:5)), 1);
-% fitted_line = exp(polyval(p, log(N)));
-% loglog(N, fitted_line, '--','DisplayName', sprintf('Fit (p=%.2f)', p(1)));
-% legend('EOC',sprintf('Fit (p=%.2f)', p(1)))
 xlim([15,450])
 ylim([0,3])
 xlabel('N_x');
@@ -79,6 +90,8 @@ xticklabels(arrayfun(@num2str, N, 'UniformOutput', false));
 
 
 %% 2.4
+clc
+
 a = 1;
 b = 0;
 t_end = 2;
@@ -114,7 +127,7 @@ p = plot(x,u_approx);
 drawnow
 for t = dt:dt:t_end
     u_approx = updateU(u_approx);
-    p = plot(x,u_approx,x,u_exact);
+    p = plot(x,u_approx);
     xlim([0,3]);
     legend('u aproximate');
     title("Wave Plot");
