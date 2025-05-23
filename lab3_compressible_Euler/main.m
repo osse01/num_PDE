@@ -105,3 +105,91 @@ for J = Nx
         dx_prev = dx;
         k = k + 1;
 end
+
+%% Exercise 2.3
+close all
+clear
+clc
+display = true;
+gamma = 1.4;
+CFL = 0.95;
+t_end = 0.2;
+data = readmatrix('sod_reference_solution.txt', 'FileType', 'text', 'CommentStyle', '%');
+x_exact = data(:,1);
+u_exact = data(:,2:4);
+k = 1;
+
+J = 1000;
+x = linspace(0,1,J);
+u = prims2con(initial(x),gamma);
+dx = 1/J;
+t = 0;
+while t < t_end
+    [dt,lambda_max] = get_dt(u,dx,CFL,gamma);
+    t = t + dt; % Time Update
+    
+    if(true)
+        % Rusanov Flux Method
+        u_new(:,1) = u(:,1) - (dt/dx) * ...
+            (rusanov_flux(u(:,1),u(:,2),gamma,lambda_max) - ...
+            rusanov_flux(u(:,1),u(:,1),gamma,lambda_max));
+
+        for j = 2:J-1
+            u_new(:,j) = u(:,j) - dt/dx * ...
+            (rusanov_flux(u(:,j),u(:,j+1),gamma,lambda_max) - ...
+            rusanov_flux(u(:,j-1),u(:,j),gamma,lambda_max));
+        end
+        
+        u_new(:,J) = u(:,J) - dt/dx * ...
+            (rusanov_flux(u(:,J),u(:,J),gamma,lambda_max) - ...
+            rusanov_flux(u(:,J-1),u(:,J),gamma,lambda_max));
+        
+        u = u_new;
+    else
+        % Roe Flux Method
+        u_new(:,1) = u(:,1) - dt/dx * ...
+            (roe_flux(u(:,1),u(:,2),gamma) - ...
+            roe_flux(u(:,J),u(:,1),gamma));
+        
+        for j = 2:J-1
+            u_new(:,j) = u(:,j) - dt/dx * ...
+            (roe_flux(u(:,j),u(:,j+1),gamma) - ...
+            roe_flux(u(:,j-1),u(:,j),gamma));
+        end
+        
+        u_new(:,J) = u(:,J) - dt/dx * ...
+            (roe_flux(u(:,J),u(:,1),gamma) - ...
+            roe_flux(u(:,J-1),u(:,J),gamma));
+
+        u = u_new;
+    end
+    
+    % Plot Solution
+    if (display)
+        plot(x,u(1,:));
+        hold on;
+        plot(x_exact,u_exact(:,1));
+        hold off;
+        legend('u_approx','u_exact')
+        drawnow;
+    end
+    
+end
+
+
+function prim_0 = initial(x)
+N = numel(x);
+rho = zeros(1,N);
+p = zeros(1,N);
+v = zeros(1,N);
+    for idx = 1:N
+        if (x(idx)<0.5)
+            rho(idx) = 1;
+            p(idx) = 1;
+        else
+            rho(idx) = 0.125;
+            p(idx) = 0.1;
+        end
+    end
+prim_0 = [rho;v;p];
+end
