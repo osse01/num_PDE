@@ -138,12 +138,11 @@ end
 
 %% 2.5
 a = 1;
-%b = 0;
-t_end = 3;
+t_end = 15;
 Nx = 300;
-dx = 1/(Nx-1);
-b = 3*a*dx
-dt = 0.5/250; % 250 time steps until t_end
+b = 0.01;
+dx = 3*b/a;
+dt = t_end/250; % 250 time steps until t_end
 u_0 = @(x) x;
 
 % Help variables
@@ -174,7 +173,7 @@ p = plot(x,u_approx);
 drawnow
 for t = dt:dt:t_end
     u_approx = updateU(u_approx);
-    p = plot(x,u_approx,x,u_exact);
+    p = plot(x,u_approx);
     xlim([0,1]);
     legend('u aproximate');
     title("Wave Plot");
