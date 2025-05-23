@@ -3,6 +3,7 @@
 close all
 clear
 clc
+display = false;
 
 % Parameters
 CFL = 0.95;
@@ -21,8 +22,15 @@ u_exact = @(x,t) [2 + 0.5*sin(2*pi*(x - t));
 
 Nx = [50, 100, 200, 400, 800];
 
+EOC = table('Size', [0 5], ...
+            'VariableTypes', {'double', 'double', 'double', 'double', 'double'}, ...
+            'VariableNames', {'k', 'Nx', 'dx', 'Ek', 'EOC'});
+k = 1;
+
 for J = Nx
-    figure(J)
+    if(display)
+        figure(J)
+    end
     dx = 1/J;
     x = (0.5 + (0:J-1))*dx;
     u = prims2con(prim_0(x),gamma);
@@ -70,8 +78,30 @@ for J = Nx
         u_xt = u_exact(x,t);
         
         % Plot Solution
-        plot(x,u(1,:),x,u_xt(1,:));
-        legend('u_approx','u_exact')
-        drawnow;
+        if (display)
+            plot(x,u(1,:),x,u_xt(1,:));
+            legend('u_approx','u_exact')
+            drawnow;
+        end
+        
     end
+
+    % Calculate Error
+        u_xt = u_exact(x, t);
+        err = u(1,:) - u_xt(1,:);
+        Ek = sqrt(sum(err.^2) * dx);
+    
+        if k > 1
+            EOC_k = log(Ek_prev / Ek) / log(dx_prev / dx);
+        else
+            EOC_k = NaN;
+        end
+    
+        newRow = {k, J, dx, Ek, EOC_k};
+        EOC = [EOC; newRow];
+    
+        % Update previous error and dx
+        Ek_prev = Ek;
+        dx_prev = dx;
+        k = k + 1;
 end
